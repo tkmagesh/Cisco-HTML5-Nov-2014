@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Web Workers Demo</title>
+    <script>
+        window.addEventListener("DOMContentLoaded",init);
+        var worker = new Worker("workerScript.js");
+        
+        function init(){
+            var btnDoWork = document.getElementById("btnDoWork");
+            btnDoWork.addEventListener("click", onBtnDoWorkClick);
+            
+            worker.addEventListener("message", onMessageFromWorker);
+        }
+        function onBtnDoWorkClick(){
+            worker.postMessage("start");
+            displayMessage("Work Started");
+        }
+        function onMessageFromWorker(msgEvtArg){
+            
+            var workerData = msgEvtArg.data;
+            console.log(workerData);
+            if (workerData.type === "completion"){
+                displayMessage("Work Completed");
+            } else if (workerData.type === "progress"){
+                document.getElementById("progress").value = workerData.percentCompleted;
+            } else {
+                console.log("unknown message received from worker ", msgEvtArg.data);
+            }
+        }
+        function displayMessage(msg){
+            var divMessages = document.getElementById("divMessages");
+            divMessages.innerHTML += msg + "<br/>";
+        }
+    </script>
+</head>
+<body>
+    <input type="text" name="" id="">
+    <input type="button" value="Do Work" id="btnDoWork">
+    <div>
+        <progress id="progress" min="0" max="100" value="0"></progress>
+    </div>
+    <div id="divMessages"></div>
+</body>
+</html>
